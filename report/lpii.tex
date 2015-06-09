@@ -1,0 +1,130 @@
+\documentclass[10pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb}
+% \usepackage{minted}
+\usepackage{listingsutf8}
+\usepackage{url}
+\usepackage{natbib}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{adjustbox} % Used to scale size of tables
+\usepackage{acl2015}
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage{multirow}
+\usepackage{array}
+
+\begin{document}
+\sloppy
+\title{Supervised Relation Extraction\\\large Language Processing II}
+\author{Sarah McGillon and Zeerak Waseem Butt}
+\maketitle
+\begin{abstract}
+% TODO shorten the abstract
+Relation extraction is the task of deriving interactions between entities from unstructured text. Supervised RE systems approach this problem by using labeled data to build models that will detect not only if a relationship is present, but also how the entities interact with respect to that relationship.\\
+In our review of the field we found that common methods consist of supervised learning methods, such as kernel methods for extracting relations and conditional random fields (CRF) for Named Entity Recognition (NER). With NER tagging relying on part of speech (POS) tagging.\\
+Our pipeline consists of a Hidden Markov Model and a Structured perceptron for part of speech tagger, a conditional random field named entity recogniser and an ensemble system of relation classifiers for relation extraction. We have chosen to primarily focus on the named entity recogniser and the relationship extraction, given the relatively high precision \emph{INSERT HIGH SCORE HERE} of the part of speech tagger built during the course as compared to the remainder of the system (\emph{NER AND RE SCORE HERE}).\\
+Our findings with regard to the named entity recognition is consistent with the results presented by \newcite{Giuliano}, suggesting that a bad named entity recogniser impaired the results of the relation extraction. After our improvement to our simple implementation of the named entity recogniser and relation extractor we found a \emph{WRITE PERCENTAGE IMPROVEMENT HERE} improvement.
+
+%what is the general area (relation extraction)?\\
+%what is the predominant approach?\\
+%what are common problems?\\
+%what do you address?\\
+%what results do you get?
+\end{abstract}
+\section{Introduction}
+Relation Extraction (RE) is a subtask of Information Extraction (IE) (\newcite{Giuliano}), which seeks to extract structured information on relations from unstructured text documents. \newcite{Grishman} outlines tasks in IE to be tokenisation, part of speech (POS) tagging, named entity recognition (NER), and the relation extraction task amongst others. A common approach to an end-to-end system is to tokenise the the unstructured text, following by POS tagging, extracting named entities, building relation pairs and features between these, and finally extracting the realations between the entities, as is the structure used by \newcite{Giuliano}.\\
+Each part of a relation extraction pipeline would alter the an input sequence as given below, given the use of this particular method.
+
+\begin{itemize}
+  \item{Tokenisation}
+      \begin{itemize}
+      \item{From: ``In 1830, poet Emily Dickinson was born in Amherst, Mass.''} 
+      \item{To ``In 1830 , poet Emily Dickinson was born in Amherst , Mass.''}
+    \end{itemize}
+  \item{Part of speech tagging}
+    \begin{itemize}
+      \item{To ``In 1830 , poet Emily Dickinson was born in Amherst , Mass.''}
+      \item{``In (ADP) 1830 (NUM) , (.) poet (NOUN) Emily (PROPN) Dickinson (PROPN) was (VERB) born (VERB) in (ADP) Amherst (PROPN) , (.) Mass. (PROPN)''}
+    \end{itemize}
+  \item{Named entity recognition}
+    \begin{itemize}
+      \item{``In (ADP) 1830 (NUM) , (.) poet (NOUN) Emily (PROPN) Dickinson (PROPN) was (VERB) born (VERB) in (ADP) Amherst (PROPN) , (.) Mass. (PROPN)''}
+      \item{``In (ADP) [O] 1830 (NUM) [O] , (.) [O]  poet (NOUN) [O] Emily (PROPN) [B-PER] Dickinson (PROPN) [I-PER] was (VERB) [O] born (VERB) [O] in (ADP) [O] Amherst (PROPN) [B-LOC] , (.) [O] Mass. (PROPN) [I-LOC]''}
+    \end{itemize}
+  \item{Relation Extraction}
+    \begin{itemize}
+      \item{``In (ADP) [O] 1830 (NUM) [O] , (.) [O]  poet (NOUN) [O] Emily (PROPN) [B-PER] Dickinson (PROPN) [I-PER] was (VERB) [O] born (VERB) [O] in (ADP) [O] Amherst (PROPN) [B-LOC] , (.) [O] Mass. (PROPN) [I-LOC]''}
+      \item{Takes form as (entity1, entity2, relation): (Emily - Dickinson, Amherst - Mass., live\_in)}
+    \end{itemize}
+\end{itemize}
+
+% TODO Write something about our pipeline
+% TODO Write something about limitations (see Giuliano)
+% TODO Write something about challenges with implementation/results
+% TODO Write something about who did what
+
+% repeats structure of Abstract\\
+% give example for area and problem\\
+% extend with references\\
+% state contributions\\
+\section{Previous Work}
+\newcite{Giuliano}\\
+\newcite{GuoDong}\\
+\newcite{Grishman}
+\section{Experiments}
+The following describes the pipeline set up for relation extraction. The full process of building this relation extraction system involves developing a Part Of Speech (POS) tagger as well as a Named Entity Recogniser (NER). This is necessary as relationships exist between entities, and entities are usually some form of noun.
+\subsection{POS Tagger}
+\begin{itemize}
+	\item number of training instances/types,
+	\item features 
+	\item  system
+\end{itemize}
+\subsection{NER Tagger}
+\begin{itemize}
+	\item number of training instances/types,
+	\item features 
+	\item  system
+\end{itemize}
+\subsection{Relation Extractor}
+Four different binary classification models were constructed, one for each of the relations we were trying to extract and a model that decided if there was a relationship between two entities or not. For every pair of entities in a sentence features we constructed. As the relations have two different argument types it was decided to create features such that {$\bf E_{ij}=E_{ji}$, use these features to predict the type of relation and use the Named Entity tag to decide on the direction. This can reduce the number of negative examples that can be extracted from sentences with many entities that are un related. 
+
+When preparing the training data for the Relation/No-Relation classifier only negative examples in which the distance between the two entities is smaller than three words were kept to further reduce the unbalance of the dataset.
+
+For each of the three relation classifiers only instances belonging to the particular relation type were used to extract features and train the models.
+
+
+data description:\\
+\begin{itemize}
+	\item source,
+	\item huber of instances/tokens/types, 
+	\item distribution of labels
+\end{itemize}
+
+model description:
+\begin{enumerate}
+	\item features, 
+	\item learner, 
+	\item parameters
+\end{enumerate}
+
+experimental setup:\\
+task, evaluation metrics
+
+\section{Results}
+\subsection{test set}
+a table of results on the actual test set (baseline, your system(s), related work)\\
+a description of the table\\
+relate results of dev set to those obtained on test set
+\section{Discussion}
+analysis of results, ``digging deeper''\\
+an example where it went wrong, speculation about the why\\
+an example of where it worked well, speculation about the why\\
+how generalizable are these results (significance tests)?
+\section{Conclusion}
+re-state contributions\\
+re-state main results\\
+indicate directions for future work
+\bibliographystyle{acl}
+\bibliography{reference}
+\end{document}
